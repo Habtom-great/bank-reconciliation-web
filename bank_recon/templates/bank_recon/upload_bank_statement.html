@@ -1,0 +1,29 @@
+<!-- templates/upload.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Upload Bank Statement</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+<div class="container mt-5">
+    <h2 class="mb-4">Upload Bank Statement</h2>
+
+    <form method="POST" action="{% url 'upload_bank_statement' %}" enctype="multipart/form-data" class="mb-4">
+        {% csrf_token %}
+        <input type="file" name="bank_statement_file" class="form-control mb-3" required />
+        <button type="submit" class="btn btn-primary">Upload</button>
+    </form>
+
+    {% if file_url %}
+        <div class="alert alert-success mt-3">
+            File uploaded successfully: 
+            <a href="{{ file_url }}" target="_blank">{{ file_url }}</a>
+        </div>
+    {% elif error %}
+        <div class="alert alert-danger mt-3">{{ error }}</div>
+    {% endif %}
+</div>
+</body>
+</html>

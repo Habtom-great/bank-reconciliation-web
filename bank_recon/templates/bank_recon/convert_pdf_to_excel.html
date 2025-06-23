@@ -1,0 +1,35 @@
+
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-lg border-0 rounded-4">
+                <div class="card-header bg-primary text-white text-center rounded-top-4">
+                    <h3><i class="bi bi-file-earmark-arrow-down"></i> Convert PDF to Excel</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="pdf_file" class="form-label">Upload Bank Statement (PDF)</label>
+                            <input type="file" name="pdf_file" accept=".pdf" class="form-control" required>
+                            <div class="form-text text-muted">Only .pdf files are supported</div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="bi bi-arrow-right-circle-fill"></i> Convert and Download Excel
+                        </button>
+                    </form>
+                </div>
+                <div class="card-footer text-center text-muted small">
+                    📄 Secure and private · No data is stored
+                </div>
+            </div>
+            <div class="container mt-5">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm">← Back to Home page</a>
+                  </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,201 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bank Reconciliation Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f1f3f5;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        .dashboard-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #343a40;
+        }
+        .card-box {
+            border-radius: 16px;
+            transition: 0.3s ease-in-out;
+        }
+        .card-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+        .amount {
+            font-size: 30px;
+            font-weight: bold;
+        }
+        .section-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 1rem;
+        }
+        .recent-card .card-header {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+
+    <!-- Dashboard Header -->
+    <div class="text-center mb-5">
+        <h1 class="dashboard-title">💼 Bank Reconciliation Dashboard</h1>
+        <p class="text-muted fs-5">Monitor your financial activity in real time</p>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row justify-content-center g-4 mb-4">
+        <div class="col-md-4">
+            <a href="{% url 'payment_report' %}" class="text-decoration-none">
+                <div class="card bg-danger text-white text-center card-box shadow">
+                    <div class="card-body py-4">
+                        <h4 class="card-title">💸 Total Payments</h4>
+                        <p class="amount">ETB {{ total_payment|floatformat:2 }}</p>
+                        <p>View all payments</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'deposit_report' %}" class="text-decoration-none">
+                <div class="card bg-success text-white text-center card-box shadow">
+                    <div class="card-body py-4">
+                        <h4 class="card-title">💰 Total Deposits</h4>
+                        <p class="amount">ETB {{ total_deposit|floatformat:2 }}</p>
+                        <p>View all deposits</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        <div class="col-md-4">
+            <a href="{% url 'all_transactions_report' %}" class="text-decoration-none">
+                <div class="card bg-info text-white text-center card-box shadow">
+                    <div class="card-body py-4">
+                        <h4 class="card-title">📊 All Transactions</h4>
+                        <p class="amount">Full Report</p>
+                        <p>All deposits and payments</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+<!--convert pdf to excel-->
+<div class="col-md-4">
+    <a href="{% url 'convert_pdf_to_excel' %}" class="text-decoration-none">
+        <div class="card bg-warning text-dark text-center card-box shadow">
+            <div class="card-body py-4">
+                <h4 class="card-title">📁 Convert PDF to Excel</h4>
+                <p class="amount">Open Tool</p>
+                <p>Convert your bank PDF to Excel</p>
+            </div>
+        </div>
+    </a>
+</div>
+    <!-- Upload Bank Statement -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-lg-8">
+            <div class="card shadow p-4">
+                <h5 class="section-title">Upload New Bank Statement</h5>
+                <form method="POST" enctype="multipart/form-data" action="{% url 'upload_bank_statement' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <input type="file" name="bank_statement_file" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload</button>
+                </form>
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} mt-3">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Filter Transactions -->
+    <div class="row justify-content-center mb-4">
+        <div class="col-lg-8">
+            <div class="card shadow p-4">
+                <h5 class="section-title">Filter Transactions</h5>
+                <form method="GET" action="">
+                    <div class="row g-3 align-items-center">
+                        <div class="col-md-4">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request.GET.start_date }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request.GET.end_date }}">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="transaction_type" class="form-label">Transaction Type</label>
+                            <select name="transaction_type" id="transaction_type" class="form-select">
+                                <option value="" {% if not request.GET.transaction_type %}selected{% endif %}>All</option>
+                                <option value="deposit" {% if request.GET.transaction_type == 'deposit' %}selected{% endif %}>Deposit</option>
+                                <option value="payment" {% if request.GET.transaction_type == 'payment' %}selected{% endif %}>Payment</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-secondary">Apply Filter</button>
+                        <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary">Reset</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Transactions -->
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow recent-card">
+                <div class="card-header bg-primary text-white text-center">
+                    📄 Recent Transactions
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% for tx in transactions %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>{{ tx.date }}</strong> –
+                                {% if tx.transaction_type == 'payment' %}
+                                    <span class="badge bg-danger">Payment</span>
+                                    to <em>{{ tx.person|default:"N/A" }}</em>
+                                {% else %}
+                                    <span class="badge bg-success">Deposit</span>
+                                    from <em>{{ tx.person|default:"N/A" }}</em>
+                                {% endif %}
+                            </div>
+                            <div>
+                                {% if tx.transaction_type == 'payment' %}
+                                    <strong class="text-danger">– {{ tx.amount|floatformat:2 }}</strong>
+                                {% else %}
+                                    <strong class="text-success">+ {{ tx.amount|floatformat:2 }}</strong>
+                                {% endif %}
+                            </div>
+                        </li>
+                    {% empty %}
+                        <li class="list-group-item text-center text-muted">No recent transactions available.</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap Bundle JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

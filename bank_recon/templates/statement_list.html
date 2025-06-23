@@ -1,0 +1,8 @@
+<h2>Uploaded Bank Statements</h2>
+<ul>
+  {% for statement in statements %}
+    <li><a href="{{ statement.file.url }}">{{ statement.file.name }}</a> - uploaded at {{ statement.uploaded_at }}</li>
+  {% empty %}
+    <li>No bank statements uploaded yet.</li>
+  {% endfor %}
+</ul>
